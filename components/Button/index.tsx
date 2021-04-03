@@ -9,7 +9,15 @@ const colors = {
   blue: styles.buttonBlue,
 };
 
-export const Button = ({
+type Props = {
+  children: React.ReactNode;
+  disabled?: boolean;
+  color?: keyof typeof colors;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  className?: string;
+}
+
+export const Button: React.FC<Props> = ({
   children,
   disabled,
   color,

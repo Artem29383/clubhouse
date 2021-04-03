@@ -4,10 +4,12 @@ import { Button } from '../../Button';
 import { StepInfo } from '../../StepInfo';
 
 import styles from './EnterNameStep.module.scss';
-import React from 'react';
+import React, { useContext } from 'react';
+import { MainContext } from "../../../pages";
 
 export const EnterNameStep = () => {
   const [inputValue, setInputValue] = React.useState('');
+  const { onNextStep } = useContext(MainContext);
 
   const nextDisabled = !inputValue;
 
@@ -16,7 +18,7 @@ export const EnterNameStep = () => {
   };
 
   const onClickNextStep = () => {
-    // onNextStep();
+    onNextStep();
   };
 
   return (

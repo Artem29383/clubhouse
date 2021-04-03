@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import clsx from 'clsx'
 import { WhiteBlock } from '../../WhiteBlock'
 import { Button } from '../../Button'
@@ -6,15 +6,17 @@ import { StepInfo } from '../../StepInfo'
 import { Avatar } from '../../Avatar'
 
 import styles from './ChooseAvatarStep.module.scss'
+import { MainContext } from "../../../pages";
 
-export const ChooseAvatarStep = () => {
+export const ChooseAvatarStep: React.FC = () => {
   const [avatarUrl, setAvatarUrl] = React.useState(
     'https://i.pinimg.com/originals/33/db/51/33db51b709c04b279a1826b3bbf0faf2.png'
   )
-  const inputFileRef = React.useRef(null)
+  const inputFileRef = React.useRef<HTMLInputElement>(null)
+  const { onNextStep } = useContext(MainContext);
 
-  const handleChangeImage = (event) => {
-    const file = event.target.files[0]
+  const handleChangeImage = (event: Event): void => {
+    const file = (event.target as HTMLInputElement).files[0]
     if (file) {
       const imageUrl = URL.createObjectURL(file)
 
@@ -43,7 +45,7 @@ export const ChooseAvatarStep = () => {
           </label>
         </div>
         <input id="image" ref={inputFileRef} type="file" hidden />
-        <Button onClick={() => {}}>
+        <Button onClick={onNextStep}>
           Next
           <img className="d-ib ml-10" src="/static/arrow.svg" />
         </Button>

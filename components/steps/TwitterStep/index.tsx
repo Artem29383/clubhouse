@@ -4,9 +4,11 @@ import { Button } from '../../Button'
 import { StepInfo } from '../../StepInfo'
 
 import styles from './TwitterStep.module.scss'
-import React from 'react'
+import React, { useContext } from 'react'
+import { MainContext } from "../../../pages";
 
 export const TwitterStep = () => {
+  const { onNextStep } = useContext(MainContext);
 
   return (
     <div className={styles.block}>
@@ -23,7 +25,7 @@ export const TwitterStep = () => {
           </svg>
         </div>
         <h2 className="mb-40">Artem Averyanov</h2>
-        <Button onClick={() => {}}>
+        <Button onClick={onNextStep}>
           <img src="/static/twitter.svg" alt="Twitter logo" className={styles.twitterLogo} />
           Import from Twitter
           <img className="d-ib ml-10" src="/static/arrow.svg" />

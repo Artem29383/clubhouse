@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import clsx from 'clsx'
 import { WhiteBlock } from '../../WhiteBlock'
 import { Button } from '../../Button'
@@ -7,9 +7,16 @@ import { StepInfo } from '../../StepInfo'
 import styles from './EnterPhoneStep.module.scss'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/bootstrap.css'
+import { MainContext } from "../../../pages";
+
+type InputValueState = {
+  format: string
+  value: string
+}
 
 export const EnterPhoneStep = () => {
-  const [values, setValues] = React.useState({})
+  const [values, setValues] = React.useState<InputValueState>({} as InputValueState)
+  const { onNextStep } = useContext(MainContext);
 
   const nextDisabled = !values.value || values.value.length !== values.format.match(/[.]/g).length
 
@@ -26,7 +33,7 @@ export const EnterPhoneStep = () => {
           <PhoneInput
             country={'by'}
             value={values.value}
-            onChange={(value, country) => {
+            onChange={(value, country: { format: string }) => {
               setValues({ value, format: country.format })
             }}
             inputClass="field-phone_input"
@@ -39,7 +46,7 @@ export const EnterPhoneStep = () => {
             }}
           />
         </div>
-        <Button disabled={nextDisabled} onClick={() => {}}>
+        <Button disabled={nextDisabled} onClick={onNextStep}>
           Next
           <img className="d-ib ml-10" src="/static/arrow.svg" />
         </Button>
