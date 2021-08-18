@@ -3,10 +3,10 @@ import { Header } from '../../components/Header'
 import {Button} from "../../components/Button";
 import ConversionCard from "../../components/ConversionCard";
 import Link from 'next/link';
-import axios from "../../core/axios";
 import {GetServerSideProps} from "next";
 import clsx from "clsx";
 import styles from './Styles.module.scss'
+import axios from "axios";
 export type RoomsTypes = {
   id: string;
   avatars: string[];

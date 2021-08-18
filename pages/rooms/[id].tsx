@@ -1,11 +1,10 @@
 import React from 'react';
 import {useRouter} from "next/router";
 import {Header} from "../../components/Header";
-import {Button} from "../../components/Button";
 import BackButton from "../../components/BackButton";
 import RoomComponent from './../../components/Room';
-import Axios from '../../core/axios';
 import {GetServerSideProps} from "next";
+import { Axios } from "../../core/axios";
 
 const Room = ({ room }) => {
   const router = useRouter()

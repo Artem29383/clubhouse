@@ -1,15 +1,13 @@
-import axios from 'axios'
+import axios from 'axios';
+import { parseCookies } from 'nookies';
+
+const cookies = parseCookies();
 
 const Axios = axios.create({
-  baseURL: 'http://localhost:3000',
-  withCredentials: true,
-})
+  baseURL: 'http://localhost:4000',
+  headers: {
+    Authorization: 'Bearer ' + cookies?.token,
+  },
+});
 
-Axios.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    config.headers.Authorization = window.localStorage.getItem('token')
-  }
-  return config
-})
-
-export default Axios;
+export { Axios };

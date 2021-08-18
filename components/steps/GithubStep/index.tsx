@@ -3,12 +3,26 @@ import { WhiteBlock } from '../../WhiteBlock'
 import { Button } from '../../Button'
 import { StepInfo } from '../../StepInfo'
 
-import styles from './TwitterStep.module.scss'
-import React, { useContext } from 'react'
+import styles from './GithubStep.module.scss'
+import React, { useContext, useEffect } from 'react'
 import { MainContext } from "../../../pages";
 
 export const TwitterStep = () => {
-  const { onNextStep } = useContext(MainContext);
+  const { onNextStep, setUserData } = useContext(MainContext);
+
+  const handleCLickAuth = () => {
+    window.open('http://localhost:4000/auth/github', 'Auth', 'width=400, height=400, status=yes, toolbar=no, menubar=no, location=no')
+  }
+
+  useEffect(() => {
+    window.addEventListener('message', ({ data }) => {
+      if (typeof data === 'string' && data.includes('avatarUrl')) {
+        const json = JSON.parse(data);
+        setUserData(json)
+        onNextStep();
+      }
+    })
+  }, [])
 
   return (
     <div className={styles.block}>
@@ -25,9 +39,9 @@ export const TwitterStep = () => {
           </svg>
         </div>
         <h2 className="mb-40">Artem Averyanov</h2>
-        <Button onClick={onNextStep}>
+        <Button onClick={handleCLickAuth}>
           <img src="/static/twitter.svg" alt="Twitter logo" className={styles.twitterLogo} />
-          Import from Twitter
+          Import from Github
           <img className="d-ib ml-10" src="/static/arrow.svg" />
         </Button>
         <div className="link mt-20 cup d-ib">Enter my info manually</div>

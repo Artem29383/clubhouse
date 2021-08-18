@@ -3,18 +3,31 @@ import React from 'react';
 
 import styles from './Avatar.module.scss';
 
-type Props = {
+interface AvatarProps {
   src: string;
   width: string;
   height: string;
   className?: string;
   isVoice?: boolean;
+  letters?: string;
 }
 
-export const Avatar: React.FC<Props> = ({ src, width, height, className, isVoice }) => {
+export const Avatar: React.FC<AvatarProps> = ({
+                                                src,
+                                                width,
+                                                height,
+                                                className,
+                                                isVoice,
+                                                letters,
+                                              }) => {
+
   return (
     <div
-      style={{ width, height, backgroundImage: `url(${src})` }}
-      className={clsx(styles.avatar, isVoice ? styles.avatarBorder : '', className, 'd-ib')}></div>
+      style={{ width, height, backgroundImage: src ? `url(${src})` : '' }}
+      className={clsx(styles.avatar, isVoice ? styles.avatarBorder : '', className, 'd-ib', {
+        [styles.emptyAvatar]: !src,
+      })}>
+      {!src ? letters : null}
+    </div>
   );
 };
