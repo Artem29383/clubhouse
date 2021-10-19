@@ -1,39 +1,52 @@
-import React, {useEffect} from 'react'
+import React, { useState } from 'react'
 import { Header } from '../../components/Header'
-import {Button} from "../../components/Button";
+import { Button } from "../../components/Button";
 import ConversionCard from "../../components/ConversionCard";
 import Link from 'next/link';
-import {GetServerSideProps} from "next";
+import { NextPage } from "next";
 import clsx from "clsx";
+import Head from 'next/head'
 import styles from './Styles.module.scss'
-import axios from "axios";
-export type RoomsTypes = {
-  id: string;
-  avatars: string[];
-  guestsCount: number;
-  speakersCount: number;
-  title: string;
-  guests: string[];
-}
+import { checkAuth } from "../../helpers/checkAuth";
+import { StartRoomModal } from "../../components/StartRoomModal";
+import { Api } from "../../api";
+import { Room } from "../../api/RoomApi";
+import { wrapper } from "../../redux/store";
+import { setRooms } from "../../redux/slices/roomsSlice";
+import { useSelector } from "react-redux";
+import { selectRooms } from "../../redux/selectors";
 
-export default function RoomsPage({ rooms = [] }: { rooms: RoomsTypes[]}) {
+
+const RoomsPage: NextPage = () => {
+  const [visibleModal, setVisibleModal] = useState(false);
+  const rooms = useSelector(selectRooms);
+
   return (
     <>
+      <Head>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <title>Clubhouse: Drop-in audio chat</title>
+      </Head>
       <Header />
       <div className="container">
         <div className='mt-40 d-flex align-items-center justify-content-between'>
           <h1>All conversations</h1>
-          <Button color='green' onClick={() => {}}>+ Start room </Button>
+          <Button
+            onClick={() => setVisibleModal(true)}
+            color="green">
+            + Start room
+          </Button>
         </div>
+        {visibleModal && <StartRoomModal onClose={() => setVisibleModal(false)} />}
         <div className={clsx(styles.grid, 'mt-20')}>
           {rooms.map(room => (
             <Link key={room.id} href={`/rooms/${room.id}`}>
               <a>
                 <ConversionCard
-                  speakersCount={room.speakersCount}
-                  guestsCount={room.guestsCount}
-                  users={room.guests}
-                  title={room.title} avatars={room.avatars}
+                  title={room.title}
+                  avatars={[]}
+                  speakers={room.speakers || []}
+                  listenersCount={room.listenersCount}
                 />
               </a>
             </Link>
@@ -44,12 +57,30 @@ export default function RoomsPage({ rooms = [] }: { rooms: RoomsTypes[]}) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export default RoomsPage;
+
+export const getServerSideProps = wrapper.getServerSideProps(store => async (ctx) => {
   try {
-    const { data } = await axios.get('/rooms.json')
+    const user = await checkAuth(ctx, store);
+
+
+    if (!user) {
+      return {
+        props: {},
+        redirect: {
+          permanent: false,
+          destination: '/',
+        },
+      };
+    }
+
+    const rooms = await Api(ctx).getRooms();
+    store.dispatch(setRooms(rooms));
+
     return {
       props: {
-        rooms: data,
+        // user,
+        // rooms,
       },
     }
   } catch (error) {
@@ -60,4 +91,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
       },
     }
   }
-}
+})

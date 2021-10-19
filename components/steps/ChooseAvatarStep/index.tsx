@@ -25,7 +25,7 @@ const uploadFile = async (file: File): Promise<{ url: string }> => {
 
 
 export const ChooseAvatarStep: React.FC = () => {
-  const { onNextStep, setFieldValue, userData: { avatarUrl: avatarUrlData, fullName } } = React.useContext(MainContext);
+  const { onNextStep, setFieldValue, userData: { avatarUrl: avatarUrlData, fullName = 'T A' } } = React.useContext(MainContext);
   const avatarLetters = fullName
     .split(' ')
     .map((s) => s[0])

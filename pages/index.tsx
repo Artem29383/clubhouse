@@ -4,7 +4,10 @@ import { TwitterStep } from "../components/steps/GithubStep";
 import { ChooseAvatarStep } from "../components/steps/ChooseAvatarStep";
 import { EnterPhoneStep } from "../components/steps/EnterPhoneStep";
 import { EnterCodeStep } from "../components/steps/EnterCodeStep";
-import React, { createContext, useCallback, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
+import { checkAuth } from "../helpers/checkAuth";
+import { Axios } from "../core/axios";
+import { wrapper } from "../redux/store";
 
 const stepsComponents = {
   0: WelcomeStep,
@@ -36,6 +39,7 @@ interface IMainContext {
 export const MainContext = createContext<IMainContext>({} as IMainContext)
 
 export type User = {
+  token?: string;
   fullName: string;
   id: string;
   avatarUrl: string;
@@ -44,8 +48,20 @@ export type User = {
   phone: string
 }
 
+const getFormStep = () => {
+  const data = JSON.parse(localStorage.getItem('userData')) || {};
+  if (data.id) {
+    if (data.phone) {
+      return 5;
+    } else {
+      return 4;
+    }
+  }
+  return 0;
+}
+
 export default function Home() {
-  const [userData, setUserData] = useState<User>()
+  const [userData, setUserData] = useState<User>(undefined)
   const [step, setStep] = useState<number>(0)
   const Step = stepsComponents[step]
 
@@ -55,6 +71,18 @@ export default function Home() {
     setUserData(prevState => ({ ...prevState, [field]: value }))
   }
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setStep(getFormStep());
+    setUserData(JSON.parse(localStorage.getItem('userData')) || {});
+  }, [])
+
+  useEffect(() => {
+    if (userData === undefined) return;
+    localStorage.setItem('userData', userData ? JSON.stringify(userData) : JSON.stringify({}));
+    Axios.defaults.headers.Authorization = `Bearer ${userData.token}`
+  }, [userData]);
+
   return (
     <div>
       <MainContext.Provider value={{ step, onNextStep, userData, setUserData, setFieldValue }}>
@@ -63,3 +91,21 @@ export default function Home() {
     </div>
   )
 }
+
+export const getServerSideProps = wrapper.getServerSideProps(store => async (ctx) => {
+  try {
+    const user = await checkAuth(ctx, store);
+    console.info('user', user)
+    if (user) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/rooms',
+          permanent: false,
+        },
+      };
+    }
+  } catch (err) {}
+
+  return { props: {} };
+});

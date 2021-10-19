@@ -1,18 +1,24 @@
-import React from 'react';
-import {useRouter} from "next/router";
-import {Header} from "../../components/Header";
+import React, { useEffect, useRef } from 'react';
+import { useRouter } from "next/router";
+import { Header } from "../../components/Header";
 import BackButton from "../../components/BackButton";
 import RoomComponent from './../../components/Room';
-import {GetServerSideProps} from "next";
-import { Axios } from "../../core/axios";
+import { Api } from "../../api";
+import { wrapper } from "../../redux/store";
+import { checkAuth } from "../../helpers/checkAuth";
+import { useSocket } from "../../hooks/useSocket";
+import { io, Socket } from "socket.io-client";
+
 
 const Room = ({ room }) => {
+  // const socket = useSocket();
   const router = useRouter()
   const { id } = router.query
 
+
   return (
     <>
-     <Header />
+      <Header />
       <div className='container mt-40'>
         <BackButton href='/rooms' title='All rooms' />
       </div>
@@ -23,22 +29,36 @@ const Room = ({ room }) => {
 
 export default Room;
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = wrapper.getServerSideProps(store => async (ctx) => {
   try {
-    const { data } = await Axios.get('/rooms.json')
+    const user = await checkAuth(ctx, store);
+
+    if (!user) {
+      return {
+        props: {},
+        redirect: {
+          permanent: false,
+          destination: '/',
+        },
+      };
+    }
+
     const roomId = ctx.query.id
-    const room = data.find((obj) => obj.id === roomId)
+
+    const room = await Api(ctx).getRoom(roomId as string);
+
     return {
       props: {
         room,
       },
     }
   } catch (error) {
-    console.log('ERROR!')
     return {
-      props: {
-        rooms: [],
-      },
+      props: {},
+      redirect: {
+        destination: '/rooms',
+        permanent: false,
+      }
     }
   }
-}
+})

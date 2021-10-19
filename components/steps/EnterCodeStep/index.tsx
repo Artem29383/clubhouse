@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import { WhiteBlock } from '../../WhiteBlock';
 import { Button } from '../../Button';
 import { StepInfo } from '../../StepInfo';
 // import Axios from '../../../core/axios';
-
 import styles from './EnterPhoneStep.module.scss';
+import { Axios } from "../../../core/axios";
+import { MainContext } from "../../../pages";
 
 export const EnterCodeStep = () => {
   const router = useRouter();
+  const { userData } = React.useContext(MainContext);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [codes, setCodes] = React.useState(['', '', '', '']);
   const nextDisabled = codes.some((v) => !v);
@@ -24,16 +26,22 @@ export const EnterCodeStep = () => {
     });
     if (event.target.nextSibling) {
       (event.target.nextSibling as HTMLInputElement).focus();
+    } else {
+      onSubmit([...codes, value].join(''));
     }
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (code: string) => {
     try {
       setIsLoading(true);
-      // await Axios.get('/todos');
-      router.push('/rooms');
+      await Axios.post(`/auth/sms/activate`, {
+        code,
+        user: userData,
+      });
+      await router.push('/rooms');
     } catch (error) {
       alert('Ошибка при активации!');
+      setCodes(['', '', '', '']);
     }
 
     setIsLoading(false);

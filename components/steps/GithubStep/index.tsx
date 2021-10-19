@@ -6,6 +6,7 @@ import { StepInfo } from '../../StepInfo'
 import styles from './GithubStep.module.scss'
 import React, { useContext, useEffect } from 'react'
 import { MainContext } from "../../../pages";
+import Cookies from "js-cookie";
 
 export const TwitterStep = () => {
   const { onNextStep, setUserData } = useContext(MainContext);
@@ -17,9 +18,12 @@ export const TwitterStep = () => {
   useEffect(() => {
     window.addEventListener('message', ({ data }) => {
       if (typeof data === 'string' && data.includes('avatarUrl')) {
+        Cookies.remove('token');
         const json = JSON.parse(data);
         setUserData(json)
         onNextStep();
+
+        Cookies.set('token', json.token);
       }
     })
   }, [])

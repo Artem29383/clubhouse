@@ -4,8 +4,12 @@ import React from 'react'
 import { Avatar } from '../Avatar'
 
 import styles from './Header.module.scss'
+import { selectUserData } from "../../redux/selectors";
+import { useSelector } from "react-redux";
 
 export const Header: React.FC = () => {
+  const userData = useSelector(selectUserData);
+
   return (
     <div className={styles.header}>
       <div className="container d-flex align-items-center justify-content-between">
@@ -17,12 +21,8 @@ export const Header: React.FC = () => {
         </Link>
         <Link href="/profile/1">
           <div className="d-flex align-items-center cup">
-            <b className="mr-10">Sviridow Vlad</b>
-            <Avatar
-              src="https://sun9-42.userapi.com/impf/c837737/v837737799/2b977/eRmA60iM_p0.jpg?size=2052x2030&quality=96&sign=e1d123cf5de1b980fbb14ebc067d9d38&type=album"
-              width="50px"
-              height="50px"
-            />
+            <b className="mr-15">{userData?.fullName}</b>
+            <Avatar src={userData?.avatarUrl} width="40px" height="40px" />
           </div>
         </Link>
       </div>
