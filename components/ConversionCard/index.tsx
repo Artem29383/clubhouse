@@ -2,12 +2,12 @@ import React from 'react';
 import styles from './ConversionCard.module.scss';
 import whiteBlockStyles from '../WhiteBlock/WhiteBlock.module.scss';
 import clsx from "clsx";
-import {Avatar} from "../Avatar";
+import { Avatar } from "../Avatar";
+import { UserData } from "../../pages";
 
 type Props = {
   title: string,
-  speakers: string[],
-  avatars: string[],
+  speakers: UserData[],
   listenersCount: number,
 }
 
@@ -15,7 +15,6 @@ type Props = {
 const ConversationCard: React.FC<Props> = ({
   title,
   speakers,
-  avatars = [],
   listenersCount,
 
 }) => {
@@ -24,21 +23,21 @@ const ConversationCard: React.FC<Props> = ({
       <h4 className={styles.title}>{title}</h4>
       <div className={clsx('d-flex mt-10', styles.content)}>
         <div className={styles.avatars}>
-          {avatars.map((url, i) => (
+          {speakers.map((user, i) => (
             <Avatar
-              key={url}
+              key={user.avatarUrl}
               width="45px"
               height="45px"
-              src={url}
-              className={avatars.length > 1 && i === avatars.length - 1 ? 'lastAvatar' : ''}
+              src={user.avatarUrl}
+              className={speakers.length > 1 && i === speakers.length - 1 ? 'lastAvatar' : ''}
             />
           ))}
         </div>
         <div className={clsx(styles.info, 'ml-10')}>
           <ul className={styles.users}>
-            {speakers.map((name, i) => (
-              <li key={name + i}>
-                {name} <img src="/static/cloud.png" alt="Cloud" width={14} height={14} />
+            {speakers.map((user, i) => (
+              <li key={user.id}>
+                {user.fullName} <img src="/static/cloud.png" alt="Cloud" width={14} height={14} />
               </li>
             ))}
           </ul>

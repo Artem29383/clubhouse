@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Header } from '../../components/Header'
 import { Button } from "../../components/Button";
 import ConversionCard from "../../components/ConversionCard";
@@ -10,16 +10,27 @@ import styles from './Styles.module.scss'
 import { checkAuth } from "../../helpers/checkAuth";
 import { StartRoomModal } from "../../components/StartRoomModal";
 import { Api } from "../../api";
-import { Room } from "../../api/RoomApi";
 import { wrapper } from "../../redux/store";
-import { setRooms } from "../../redux/slices/roomsSlice";
+import { setRooms, setRoomSpeakers } from "../../redux/slices/roomsSlice";
 import { useSelector } from "react-redux";
 import { selectRooms } from "../../redux/selectors";
+import { useSocket } from "../../hooks/useSocket";
+import { useActionWithPayload } from "../../hooks/useAction";
 
 
 const RoomsPage: NextPage = () => {
   const [visibleModal, setVisibleModal] = useState(false);
   const rooms = useSelector(selectRooms);
+  const setRoomDispatch = useActionWithPayload(setRoomSpeakers);
+  const socket = useSocket();
+
+  useEffect(() => {
+    socket.on('SERVER@ROOMS:HOME', ({ roomId, speakers }) => {
+      setRoomDispatch({
+        roomId, speakers
+      });
+    })
+  }, [])
 
   return (
     <>
@@ -44,7 +55,6 @@ const RoomsPage: NextPage = () => {
               <a>
                 <ConversionCard
                   title={room.title}
-                  avatars={[]}
                   speakers={room.speakers || []}
                   listenersCount={room.listenersCount}
                 />

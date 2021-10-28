@@ -59,7 +59,8 @@ class AuthController {
   async toSendSMS(req: any, res: express.Response) {
     const { phone } = req.query;
     const userId = req.user?.id;
-    const smsCode = getRandomCode();
+    // const smsCode = getRandomCode();
+    const smsCode = 1234;
 
     if (!phone) return res.status(400).send({
       message: 'Phone number not found'

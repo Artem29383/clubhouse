@@ -15,6 +15,8 @@ import RoomControllers from "./controllers/RoomControllers";
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { UserData } from "../pages";
+import { Room } from '../models';
+import { getUsersFromRoom } from "../utils/getUsersFromRoom";
 
 
 const app = express();
@@ -81,11 +83,26 @@ io.on('connection', socket => {
   socket.on('CLIENT@ROOMS:JOIN', ({ user, roomId }: { user: UserData, roomId: number }) => {
     socket.join(`room/${roomId}`);
     rooms[socket.id] = { roomId, user };
-    const usersInRoom = Object.values(rooms)
-      .filter((obj) => obj.roomId === roomId)
-      .map((obj) => obj.user);
+    const speakers = getUsersFromRoom(rooms, roomId);
 
-    socket.to(`room/${roomId}`).emit('SERVER@ROOMS:JOIN', usersInRoom);
+    io.in(`room/${roomId}`).emit('SERVER@ROOMS:JOIN', speakers);
+    io.emit('SERVER@ROOMS:HOME', { roomId: Number(roomId), speakers });
+    Room.update({ speakers }, { where: { id: roomId } })
+  });
+
+  ////Web RTC Audio Call
+  socket.on('CLIENT@ROOMS:CALL', ({targetUserId, callerUserId, roomId, signal }) => {
+    socket.broadcast.to(`room/${roomId}`).emit('SERVER@ROOMS:CALL', {
+      targetUserId,
+      callerUserId,
+      signal});
+  });
+
+  socket.on('CLIENT@ROOMS:ANSWER', ({ targetUserId, callerUserId, roomId, signal }) => {
+    socket.broadcast.to(`room/${roomId}`).emit('SERVER@ROOMS:ANSWER', {
+      targetUserId,
+      callerUserId,
+      signal});
   });
 
   socket.on('disconnect', () => {
@@ -94,6 +111,9 @@ io.on('connection', socket => {
       const { roomId, user } = rooms[socket.id];
       socket.broadcast.to(`room/${roomId}`).emit('SERVER@ROOMS:LEAVE', user);
       delete rooms[socket.id];
+      const speakers = getUsersFromRoom(rooms, roomId);
+      io.emit('SERVER@ROOMS:HOME', { roomId: Number(roomId), speakers });
+      Room.update({ speakers }, { where: { id: roomId } })
     }
   });
 });

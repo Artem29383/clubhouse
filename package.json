@@ -23,6 +23,7 @@
     "@types/passport-twitter": "^1.0.37",
     "@types/react-redux": "^7.1.19",
     "@types/sharp": "^0.28.5",
+    "@types/simple-peer": "^9.11.3",
     "@types/socket.io": "^3.0.2",
     "axios": "^0.21.1",
     "cloudinary": "^1.26.3",
@@ -49,6 +50,7 @@
     "sass": "^1.37.5",
     "sequelize": "^6.6.5",
     "sharp": "^0.29.0",
+    "simple-peer": "^9.11.0",
     "socket.io": "^4.3.1",
     "socket.io-client": "^4.3.2",
     "ts-node-dev": "^1.1.8"

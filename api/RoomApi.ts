@@ -1,9 +1,10 @@
 import { AxiosInstance } from 'axios';
+import { UserRoom } from "../redux/slices/roomsSlice";
 
 export interface Room {
   id: number;
   title: string;
-  speakers: any[];
+  speakers: UserRoom[];
   listenersCount: number;
 }
 
